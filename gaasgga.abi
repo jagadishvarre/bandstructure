@@ -1,0 +1,64 @@
+#GalliumArsenide Bandstructure
+#
+# Computation of the band structure.
+# First, a SCF density computation, then a non-SCF band structure calculation.
+
+ndtset 2
+
+#Definition of the unit cell
+acell 3*1.0         
+rprim  6.6542156753 0.0000000000 3.8418132114
+       2.2180718918 6.2736547033 3.8418132114
+       0.0000000000 0.0000000000 7.6836264227 
+#Definition of the atom types 
+ntypat 2          # There is only one type of atom
+znucl 31 33          # The keyword "znucl" refers to the atomic number of the
+                  # possible type(s) of atom. The pseudopotential(s)
+                  # mentioned in the "files" file must correspond
+                  # to the type(s) of atom. 
+pp_dirpath "/home/varre/sp"        # This is the path to the directory were
+                                # pseudopotentials for tests are stored
+pseudos "Ga-low_r.psp8 , As_r.psp8 "
+
+#Definition of the atoms
+
+natom 2           # There are two atoms
+typat 1 2         # They both are of type 1, that is, Silicon.
+xred              # This keyword indicate that the location of the atoms
+                  # will follow, one triplet of number for each atom
+   0.0  0.0  0.0  # Triplet giving the REDUCED coordinate of atom 1.
+   0.75  0.75  0.75  # Triplet giving the REDUCED coordinate of atom 2.
+
+#Definition of the planewave basis set
+ixc  23  #GGA
+#usekden 1
+Chksymbreak 0
+ecut 20.0      #Although this is not mandatory, it is worth to
+                  # precondition the SCF cycle. The model dielectric
+                  # function used as the standard preconditioner
+                  # is described in the "dielng" input variable section.
+                  
+#Dataset 1 : usual self-consistent calculation
+kptopt1 1          # Option for the automatic generation of k points,
+                   # taking into account the symmetry
+nshiftk1 1
+shiftk1  0.5 0.5 0.5  # These shifts will be the same for all grids
+         
+ngkpt1  8 8 8
+prtden1  1         # Print the density, for use by dataset 2
+toldfe1  1.0d-6    # This value is way too large for most realistic studies of materials
+
+#Dataset 2 : the band structure
+iscf2    -2
+getden2  -1
+kptopt2  -3  # will have three segments in the band structure
+nband   16
+ndivsm2   10   # 10 divisions of the smallest of the 3 segments, delimited
+                       # by the 5 points defined by kptbounds.
+kptbounds2  -0.5  -0.5  -0.5 # L point
+            0.0  0.0  0.0 # Gamma point
+            0.5  0.0  0.5 # X point
+            0.625 0.25 0.625 #U 
+            0.0  0.0  0.0 # Gamma point in another cell.
+tolwfr2  1.0d-12
+enunit2  1             # Will output the eigenenergies in eV
